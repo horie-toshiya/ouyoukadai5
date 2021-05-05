@@ -1,61 +1,67 @@
 class BooksController < ApplicationController
- before_action :ensure_correct_user, only: [:edit, :destroy, :update]
+  before_action :baria_user, only: [:edit, :destroy, :update]
 
-  def show
-    @book = Book.find(params[:id])
-    @user = @book.user
-  end
-
-  def index
+  def new
     @book = Book.new
-    @books = Book.all
   end
 
   def create
     @book = Book.new(book_params)
     @book.user_id = current_user.id
     if @book.save
-      redirect_to book_path(@book), notice: "You have created book successfully."
+      flash[:notice] = "You have created book successfully."
+      redirect_to book_path(@book.id)
     else
       @books = Book.all
+      @book_new = @book
       @user = User.find(current_user.id)
-      render 'index'
+      render("/books/index")
     end
+  end
+
+  def index
+    @books = Book.all
+    @book_new = Book.new
+    @user = User.find(current_user.id)
+  end
+
+  def show
+    @book_new = Book.new
+    @book = Book.find(params[:id])
+    @book_comments = @book.book_comments
+    @book_comment = BookComment.new
   end
 
   def edit
     @book = Book.find(params[:id])
   end
 
-
-
   def update
     @book = Book.find(params[:id])
     if @book.update(book_params)
-      redirect_to book_path(@book), notice: "You have updated book successfully."
+      flash[:notice] = "You have updated book successfully."
+      redirect_to book_path(@book.id)
     else
-      render "edit"
+      render ("/books/edit")
     end
   end
 
   def destroy
-    @book = Book.find(params[:id])
-    @book.destroy
-    redirect_to books_path
+    book = Book.find(params[:id])
+    flash[:notice] = "Book was successfully destroyed."
+    book.destroy
+    redirect_to("/books")
   end
 
   private
-
   def book_params
     params.require(:book).permit(:title, :body)
   end
 
-  def ensure_correct_user
-    @user = Book.find(params[:id]).user
-    unless @user == current_user
+  def baria_user
+    unless Book.find(params[:id]).user == current_user
       redirect_to books_path
     end
   end
 
 end
-

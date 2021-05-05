@@ -1,15 +1,16 @@
 class UsersController < ApplicationController
-  before_action :ensure_correct_user, only: [:update, :edit, :destroy]
+  before_action :baria_user, only: [:edit, :destroy, :update]
 
   def show
+    @book_new = Book.new
     @user = User.find(params[:id])
-    @books = @user.books
-    @book = Book.new
+    @books = @user.books.all
   end
 
   def index
+    @book_new = Book.new
+    @user = User.find(current_user.id)
     @users = User.all
-    @book = Book.new
   end
 
   def edit
@@ -17,23 +18,35 @@ class UsersController < ApplicationController
   end
 
   def update
+    @user = User.find(params[:id])
     if @user.update(user_params)
-      redirect_to user_path(@user), notice: "You have updated user successfully."
+      flash[:notice] = "You have updated user successfully."
+      redirect_to user_path(@user.id)
     else
-      render "edit"
+      render ("/users/edit")
     end
   end
 
-  private
-    def user_params
-      params.require(:user).permit(:name, :introduction, :profile_image)
-    end
+  def following
+    @user = User.find(params[:id])
+    @users = @user.following
+  end
 
-    def ensure_correct_user
-      @user = User.find(params[:id])
-      unless @user == current_user
-        redirect_to user_path(current_user)
-      end
+  def followers
+    @user = User.find(params[:id])
+    @users = @user.followers
+  end
+
+  private
+
+  def user_params
+    params.require(:user).permit(:name, :profile_image, :introduction)
+  end
+
+  def baria_user
+    unless User.find(params[:id]).id == current_user.id
+      redirect_to user_path(current_user.id)
     end
+  end
 
 end
