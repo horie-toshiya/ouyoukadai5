@@ -1,0 +1,12 @@
+<h2>Results index</h2>
+
+
+  <% if @range == "User" %>
+    <table class="table"><%= render @users %></table>
+  <% else %>
+
+    <table class="table"><%= render @books %></table>
+  <% end %>
+</table>
+
+<!--qiita @rised 複数モデルの検索機能 参照-->
