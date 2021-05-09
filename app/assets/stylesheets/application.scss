@@ -18,24 +18,29 @@
 @import 'font-awesome-sprockets';
 @import 'font-awesome';
 
-.submit{
-    padding-top: 10px;
+.fa, .fas {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 600;
+  line-height: normal;
 }
 
-header {
-  margin-bottom: 20px;
+#notice {
+  color: green;
 }
 
-footer {
+#error_explanation {
+  color: red;
+}
+
+div {
+  &.field, &.actions {
+    margin-bottom: 10px;
+  }
+}
+
+.search_form {
+  margin-top: 20px;
   text-align: center;
-  padding: 40px 0;
 }
 
-th.contents {
-    font-weight: normal;
-}
-
-.btn a {
-    color: white;
-}
 

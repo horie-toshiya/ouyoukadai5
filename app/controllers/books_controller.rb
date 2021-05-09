@@ -1,67 +1,59 @@
 class BooksController < ApplicationController
-  before_action :baria_user, only: [:edit, :destroy, :update]
+  before_action :correct_user, only: [:edit, :update, :destroy]
 
-  def new
+  def show
+    @book = Book.find(params[:id])
+    @books = Book.new
+    @user = @book.user
+    @book_comment = BookComment.new
+  end
+
+  def index
     @book = Book.new
+    @books = Book.all
   end
 
   def create
     @book = Book.new(book_params)
     @book.user_id = current_user.id
     if @book.save
-      flash[:notice] = "You have created book successfully."
-      redirect_to book_path(@book.id)
+      redirect_to book_path(@book), notice: "You have created book successfully."
     else
       @books = Book.all
-      @book_new = @book
-      @user = User.find(current_user.id)
-      render("/books/index")
+      render "index"
     end
-  end
-
-  def index
-    @books = Book.all
-    @book_new = Book.new
-    @user = User.find(current_user.id)
-  end
-
-  def show
-    @book_new = Book.new
-    @book = Book.find(params[:id])
-    @book_comments = @book.book_comments
-    @book_comment = BookComment.new
   end
 
   def edit
     @book = Book.find(params[:id])
   end
 
+
+
   def update
     @book = Book.find(params[:id])
     if @book.update(book_params)
-      flash[:notice] = "You have updated book successfully."
-      redirect_to book_path(@book.id)
+      redirect_to book_path(@book), notice: "You have updated book successfully."
     else
-      render ("/books/edit")
+      render "edit"
     end
   end
 
   def destroy
-    book = Book.find(params[:id])
-    flash[:notice] = "Book was successfully destroyed."
-    book.destroy
-    redirect_to("/books")
+    @book = Book.find(params[:id])
+    @book.destroy
+    redirect_to books_path
   end
 
   private
+
   def book_params
     params.require(:book).permit(:title, :body)
   end
 
-  def baria_user
-    unless Book.find(params[:id]).user == current_user
-      redirect_to books_path
-    end
+  def correct_user
+    @book = Book.find(params[:id])
+    redirect_to(books_url) unless @book.user == current_user
   end
 
 end
